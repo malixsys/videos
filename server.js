@@ -12,13 +12,13 @@ var app = require('./app');
  */
 
 var server,
-  port = normalizePort(process.env.PORT || '3000');
+  port = normalizePort(process.env.PORT || app.config.port || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-var useHttps = false;
+var useHttps = app.config.useHttps;
 var start = function() {
   console.log('[SERVER] Starting');
   server.listen(port, onListening);
