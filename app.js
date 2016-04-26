@@ -10,6 +10,7 @@ var videos = require('./routes/videos');
 
 var app = express();
 
+
 var configPath = path.join(__dirname, 'config.json');
 app.config = require('fs').existsSync(configPath) ? require(configPath) : {
   user: 'foo',

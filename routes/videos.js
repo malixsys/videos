@@ -1,9 +1,11 @@
 var express = require('express');
+var path = require('path');
 var serveIndex = require('serve-index');
 
-
-
 module.exports = function(app) {
+
+  //app.use(express.static(path.join(__dirname, '..', 'flowplayer')));
+
   var basicAuth = require('basic-auth');
 
   var auth = function (req, res, next) {
@@ -25,8 +27,36 @@ module.exports = function(app) {
     };
   };
 
-  var path = require('path');
+  function handleVideo(url, req, res) {
+    res.writeHead(200, {'Content-Type': 'video/mp4'});
+
+    var Transcoder = require('stream-transcoder');
+    var stream = require('fs').createReadStream(url);
+    new Transcoder(stream)
+      .maxSize(1280, 720)
+      .videoCodec('h264')
+      .videoBitrate(800 * 1000)
+      .fps(25)
+      .sampleRate(44100)
+      .channels(2)
+      .audioBitrate(128 * 1000)
+      .format('mp4')
+      .on('finish', function() {
+        console.log("Sent", url);
+      })
+      .stream().pipe(res);
+  }
+
   if(app.config.path) {
+    app.use('*', function(req, res, next) {
+      var url = req.originalUrl || req.url;
+      console.log('>', url);
+      if(/\.(mkv)$/gi.test(url)) {
+        url = path.join(app.config.path, url.replace('/videos/', '/'));
+        return handleVideo(url, req, res);
+      };
+      next();
+    });
     app.use('/videos', auth, serveIndex(app.config.path, {icons:true}));
     app.use('/videos', auth, express.static(app.config.path));
     return;
