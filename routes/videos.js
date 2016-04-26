@@ -53,7 +53,7 @@ module.exports = function(app) {
       console.log('>', url);
       if(/\.(mkv)$/gi.test(url)) {
         url = path.join(app.config.path, url.replace('/videos/', '/'));
-        return handleVideo(url, req, res);
+        return handleVideo(decodeURIComponent(url), req, res);
       };
       next();
     });
