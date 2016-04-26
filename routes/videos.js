@@ -35,7 +35,7 @@ module.exports = function(app) {
     new Transcoder(stream)
       .maxSize(1280, 720)
       .videoCodec('h264')
-      .videoBitrate(800 * 1000)
+      .videoBitrate(1672 * 1000)
       .fps(25)
       .sampleRate(44100)
       .channels(2)
