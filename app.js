@@ -52,11 +52,11 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 app.use(function(err, req, res, next) {
-  console.error( {
+  console.error('[ERROR]', {
     message: err.message,
     error: err
   });
-  res.end(500);
+  res.send('ERROR');
 });
 
 
