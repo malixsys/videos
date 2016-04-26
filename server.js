@@ -6,34 +6,45 @@
 console.log('[SERVER] Loading');
 
 var app = require('./app');
-var https = require('https');
 
 /**
  * Get port from environment and store in Express.
  */
 
 var server,
-    port = normalizePort(process.env.PORT || '3000');
+  port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-
-var pem = require('pem');
-pem.createCertificate({days:90, selfSigned:true}, function(err, keys) {
-  server = https.createServer({key: keys.serviceKey, cert: keys.certificate}, app);
-
-  /**
-   * Listen on provided port, on all network interfaces.
-   */
-
+var useHttps = false;
+var start = function() {
   console.log('[SERVER] Starting');
   server.listen(port, onListening);
 
   server.on('error', onError);
+};
+if (useHttps) {
+  var https = require('https');
+  var pem = require('pem');
+  pem.createCertificate({days: 90, selfSigned: true}, function (err, keys) {
+    server = https.createServer({key: keys.serviceKey, cert: keys.certificate}, app);
+    start();
+  });
+} else {
+  var http = require('http');
+  server = http.createServer(app);
+  start();
+}
 
-});
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+
+
+;
 
 /**
  * Normalize a port into a number, string, or false.
@@ -65,8 +76,8 @@ function onError(error) {
   }
 
   var bind = typeof port === 'string'
-      ? 'Pipe ' + port
-      : 'Port ' + port;
+    ? 'Pipe ' + port
+    : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -90,7 +101,7 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
-      ? 'pipe ' + addr
-      : 'port ' + addr.port;
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
   console.log('[SERVER] Listening on', bind, 'config\n', app.config);
 }
